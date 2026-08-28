@@ -23,7 +23,51 @@ async def on_ready():
     except Exception as e:
         print(f"❌ Error syncing commands: {e}")
 
-# ULTIMATE NUKE - Nuclear option!
+# ADD COMMAND - Invite without role assignment
+@bot.tree.command(name="add", description="🤖 Bot को अपने server में add करें!")
+async def add(interaction: discord.Interaction):
+    """Bot को invite करने के लिए link भेजता है - बिना role के!"""
+    
+    # Bot की client ID (आपको यह अपने Developer Portal से copy करना होगा)
+    CLIENT_ID = os.getenv("CLIENT_ID", "YOUR_CLIENT_ID_HERE")
+    
+    # Invite link - बिना किसी special permissions के (0 = कोई permission नहीं)
+    invite_url = f"https://discord.com/api/oauth2/authorize?client_id={CLIENT_ID}&permissions=0&scope=bot%20applications.commands"
+    
+    # Embed message बनाएं
+    embed = discord.Embed(
+        title="🤖 Bot को Add करें",
+        description="नीचे दिए गए बटन पर क्लिक करके bot को अपने server में add करें!",
+        color=discord.Color.red()
+    )
+    embed.add_field(
+        name="📋 कैसे करें:",
+        value="1️⃣ नीचे '✅ Add Bot' बटन पर क्लिक करें\n2️⃣ अपना server select करें\n3️⃣ Authorize करें\n4️⃣ बस! Bot add हो जाएगा! 🎉",
+        inline=False
+    )
+    embed.add_field(
+        name="⚙️ फायदे:",
+        value="✅ कोई भी role assign नहीं होगी\n✅ Safe और secure\n✅ सीधे bot को invite करें",
+        inline=False
+    )
+    embed.set_footer(text="Made with ❤️ by Rohit Sharma")
+    
+    # Button बनाएं
+    class AddBotView(discord.ui.View):
+        @discord.ui.button(
+            label="✅ Add Bot",
+            style=discord.ButtonStyle.red,
+            emoji="➕"
+        )
+        async def add_bot_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+            await interaction.response.send_message(
+                f"🔗 **Bot को add करने के लिए यहाँ क्लिक करें:**\n{invite_url}\n\n✅ किसी भी role की जरूरत नहीं है!",
+                ephemeral=True
+            )
+    
+    await interaction.response.send_message(embed=embed, view=AddBotView())
+
+# NUKE COMMAND (पहले वाला code)
 @bot.tree.command(name="nuke", description="🌋 COMPLETE SERVER DESTRUCTION 🌋")
 @discord.app_commands.checks.has_permissions(administrator=True)
 async def nuke(interaction: discord.Interaction):
