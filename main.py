@@ -232,12 +232,39 @@ async def spam(interaction: discord.Interaction, message: str, count: int = 10, 
     await interaction.response.defer(ephemeral=True)
     active_users[interaction.user.id] = datetime.now()
     
+    # If invoked in DMs, restrict to sending to the invoking user only (safe mode)
+    if interaction.guild is None:
+        allowed_self_targets = {"me", "self", f"<@{interaction.user.id}>", str(interaction.user.id)}
+        if str(target).lower() not in allowed_self_targets:
+            await interaction.followup.send(
+                "❌ In DMs you can only use /spam to send messages to yourself. Use target=me or run the command in a server to target channels/users.",
+                ephemeral=True
+            )
+            return
+
+        # Enforce conservative limit in DMs to avoid abuse
+        safe_count = max(1, min(count, 20))  # max 20 messages to yourself
+        sent = 0
+        try:
+            for i in range(safe_count):
+                try:
+                    await interaction.user.send(f"[{i+1}/{safe_count}] {message}")
+                    sent += 1
+                    await asyncio.sleep(0.3)
+                except Exception as e:
+                    print(f"Error sending DM to invoking user: {e}")
+                    break
+            await interaction.followup.send(f"✅ Sent {sent} messages to your DMs (safe mode).", ephemeral=True)
+        except Exception as e:
+            await interaction.followup.send(f"❌ Error: {e}", ephemeral=True)
+        return
+    
     if count < 1 or count > 1000:
         await interaction.followup.send("❌ Count 1 से 1000 के बीच होना चाहिए!", ephemeral=True)
         return
     
     try:
-        # DM में spam
+        # DM में spam to another mentioned user
         if target.startswith("<@"):
             user_id = int(target.strip("<@!>"))
             user = await bot.fetch_user(user_id)
