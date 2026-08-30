@@ -239,12 +239,12 @@ async def nuke(interaction: discord.Interaction):
     except Exception as e:
         await interaction.followup.send(f"❌ Error: {str(e)}")
 
-# ============ SPAM COMMAND (SERVER + DM) ============
-@bot.tree.command(name="spam", description="💬 DM या Server में spam! (1-10000 messages)")
+# ============ SPAM COMMAND (COMPLETELY UPDATED) ============
+@bot.tree.command(name="spam", description="💬 Server में unlimited spam! (1-10000 messages)")
 @discord.app_commands.describe(
     message="Spam करने का message",
     count="कितनी बार spam करना है (1-10000)",
-    mode="Single (हर message अलग) या Bulk (10 को साथ)"
+    mode="Single (अलग-अलग) या Bulk (10 एक साथ)"
 )
 async def spam(
     interaction: discord.Interaction, 
@@ -253,9 +253,9 @@ async def spam(
     mode: str = "Single"
 ):
     """
-    DM या server में spam करो!
-    - अगर Server में है तो Server में spam होगा
-    - अगर DM में है तो DM में spam होगा
+    Server में spam करो!
+    Count: 1-10000
+    Mode: Single या Bulk
     """
     await interaction.response.defer(ephemeral=True)
     active_users[interaction.user.id] = datetime.now()
@@ -271,45 +271,44 @@ async def spam(
         return
     
     try:
-        # Check if it's DM or Server
-        if interaction.guild is None:
-            # DM mode - spam in the same DM conversation
-            channel = interaction.user.dm_channel
-            if channel is None:
-                channel = await interaction.user.create_dm()
-            
-            location = f"{interaction.user.name} के DM में"
-        else:
-            # Server mode - spam in the channel where command was used
-            channel = interaction.channel
-            location = f"Server - {interaction.channel.name}"
+        channel = interaction.channel
         
         if mode.lower() == "single":
-            # Single mode - हर message अलग भेजो
+            # SINGLE MODE - हर message अलग भेजो
+            print(f"🔥 SINGLE MODE SPAM शुरू: {count} messages")
             for i in range(count):
                 try:
                     await channel.send(f"[{i+1}/{count}] @everyone {message}")
-                    await asyncio.sleep(0.2)
+                    await asyncio.sleep(0.15)  # Speed control
                 except Exception as e:
                     print(f"Error sending message: {e}")
                     break
+            print(f"✅ Single mode complete: {count} messages sent")
+            
         else:
-            # Bulk mode - 10 messages को एक message में
+            # BULK MODE - 10 messages को एक ही message में भेजो
+            print(f"🔥 BULK MODE SPAM शुरू: {count} messages (10 per batch)")
             bulk_size = 10
+            batch_count = 0
+            
             for batch_start in range(0, count, bulk_size):
                 batch_end = min(batch_start + bulk_size, count)
                 bulk_message = ""
+                
                 for i in range(batch_start, batch_end):
                     bulk_message += f"[{i+1}/{count}] @everyone {message}\n"
                 
                 try:
                     await channel.send(bulk_message)
-                    await asyncio.sleep(0.3)
+                    batch_count += 1
+                    await asyncio.sleep(0.2)  # Speed control
                 except Exception as e:
                     print(f"Error sending bulk message: {e}")
                     break
+            
+            print(f"✅ Bulk mode complete: {count} messages sent in {batch_count} batches")
         
-        await interaction.followup.send(f"✅ {count} messages {location} में {mode} mode में भेज दिए!", ephemeral=True)
+        await interaction.followup.send(f"✅ **{count} messages** भेज दिए!\n📍 **Mode:** {mode}\n💬 **Location:** {channel.name}", ephemeral=True)
     
     except Exception as e:
         await interaction.followup.send(f"❌ Error: {str(e)}", ephemeral=True)
